@@ -1,0 +1,512 @@
+{
+	"info": {
+		"name": "Clever Assignment API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "refresh_token",
+			"value": ""
+		},
+		{
+			"key": "photo_id",
+			"value": ""
+		},
+		{
+			"key": "photographer_id",
+			"value": ""
+		}
+	],
+	"item": [
+		{
+			"name": "Core",
+			"item": [
+				{
+					"name": "Healthcheck",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Response is {\"status\": \"ok\"}', function () {",
+									"    pm.expect(pm.response.json()).to.eql({ status: 'ok' });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"test@example.com\",\n\t\"password\": \"testpass123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/register/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"register",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    pm.collectionVariables.set('user_email', pm.request.body.raw ? JSON.parse(pm.request.body.raw).email : '');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"test@example.com\",\n\t\"password\": \"testpass123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.collectionVariables.set('access_token', jsonData.access);",
+									"}",
+									"if (jsonData.refresh) {",
+									"    pm.collectionVariables.set('refresh_token', jsonData.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refresh\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.collectionVariables.set('access_token', jsonData.access);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Photos",
+			"item": [
+				{
+					"name": "List Photos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "List Photos (Page 2)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/?page=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Photos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/?search=sunset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "sunset"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Filter by Photographer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/?photographer={{photographer_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							],
+							"query": [
+								{
+									"key": "photographer",
+									"value": "{{photographer_id}}"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Order by Width (desc)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/?ordering=-width",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "-width"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Photo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photos/{{photo_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								"{{photo_id}}",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Photo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"width\": 1920,\n\t\"height\": 1080,\n\t\"url\": \"https://example.com/photo.jpg\",\n\t\"photographer\": \"{{photographer_id}}\",\n\t\"avg_color\": \"#336699\",\n\t\"src_original\": \"https://example.com/original.jpg\",\n\t\"src_large2x\": \"https://example.com/large2x.jpg\",\n\t\"src_large\": \"https://example.com/large.jpg\",\n\t\"src_medium\": \"https://example.com/medium.jpg\",\n\t\"src_small\": \"https://example.com/small.jpg\",\n\t\"src_portrait\": \"https://example.com/portrait.jpg\",\n\t\"src_landscape\": \"https://example.com/landscape.jpg\",\n\t\"src_tiny\": \"https://example.com/tiny.jpg\",\n\t\"alt\": \"A beautiful sunset\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/photos/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.id) {",
+									"    pm.collectionVariables.set('photo_id', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Update Photo",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"alt\": \"Updated description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/photos/{{photo_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								"{{photo_id}}",
+								""
+							]
+						}
+					}
+				},
+				{
+					"name": "Delete Photo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/photos/{{photo_id}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photos",
+								"{{photo_id}}",
+								""
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Photographers",
+			"item": [
+				{
+					"name": "List Photographers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photographers/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photographers",
+								""
+							]
+						}
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.results && jsonData.results.length > 0) {",
+									"    pm.collectionVariables.set('photographer_id', jsonData.results[0].id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Search Photographers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photographers/?search=felix",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photographers",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "felix"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Order Photographers by Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/photographers/?ordering=name",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"photographers",
+								""
+							],
+							"query": [
+								{
+									"key": "ordering",
+									"value": "name"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}
